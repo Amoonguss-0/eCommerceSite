@@ -1,6 +1,7 @@
 ﻿using eCommerce.Data;
 using eCommerce.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace eCommerce.Controllers
 {
@@ -10,6 +11,16 @@ namespace eCommerce.Controllers
         public GamesController(VideoGameContext context)
         {
             _context = context;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            // Get all games from the DB
+            List<Game> games = await (from Game in _context.Games
+                                      select Game).ToListAsync();
+            // Show them on the web page
+
+            return View(games);
         }
 
         [HttpGet]
@@ -23,8 +34,6 @@ namespace eCommerce.Controllers
         {
             if (ModelState.IsValid)
             {
-                //
-
                 _context.Games.Add(game); // Prepares insert
                 await _context.SaveChangesAsync(); // Executes pending inset
 
