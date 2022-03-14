@@ -20,14 +20,19 @@ namespace eCommerce.Controllers
             const int pageOffset = 1; // used to offset current page and only put 3 games on the page at a time
             int currPage = id ?? 1; // Set currPage to id if it has a value otherwise use 1
             // Get all games from the DB
+
+            int totalNumOfProducts = await _context.Games.CountAsync();
+            double maxNumPages = Math.Ceiling((double)totalNumOfProducts / numGames);
+            int lastPage = Convert.ToInt32(maxNumPages); // rounds pages up, to the next whole page number
+
             List<Game> games = await (from Game in _context.Games
                                       select Game)
                                       .Skip(numGames * (currPage - pageOffset))
                                       .Take(numGames)
                                       .ToListAsync();
             // Show them on the web page
-
-            return View(games);
+            GameCatalogViewModel catalogModel = new(games, lastPage, currPage);
+            return View(catalogModel);
         }
 
         [HttpGet]
