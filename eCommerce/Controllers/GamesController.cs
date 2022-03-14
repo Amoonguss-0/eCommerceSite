@@ -13,11 +13,18 @@ namespace eCommerce.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id)
         {
+            // numGames is the amount of games shown per page
+            const int numGames = 3;
+            const int pageOffset = 1; // used to offset current page and only put 3 games on the page at a time
+            int currPage = id ?? 1; // Set currPage to id if it has a value otherwise use 1
             // Get all games from the DB
             List<Game> games = await (from Game in _context.Games
-                                      select Game).ToListAsync();
+                                      select Game)
+                                      .Skip(numGames * (currPage - pageOffset))
+                                      .Take(numGames)
+                                      .ToListAsync();
             // Show them on the web page
 
             return View(games);
